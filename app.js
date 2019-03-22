@@ -1,7 +1,11 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
+
+//db connection here useNewUrlParser or maybe it will be useNewUrlParser or useMongoClient
+mongoose.connect('mongodb+srv://ura-shop:' + process.env.mongo_atlas_PW + '@ura-shop-7vpyn.mongodb.net/test?retryWrites=true', {useNewUrlParser: true});
 
 //all route include from api/routes/ directory
 const productsRoutes = require('./api/routes/products');
