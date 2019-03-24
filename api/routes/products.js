@@ -7,12 +7,12 @@ const Product = require('./../models/product');
 
 router.get('/', (req, res, next) => {
     Product.find()
-    // We can use here just -__v to avoid this
+        // We can use here just -__v to avoid this
         .select('_id name price')
         .exec()
         .then(docs => {
             console.log(docs);
-            if(docs.length >0) {
+            if (docs.length > 0) {
                 const response = {
                     message: `total ${docs.length} product found`,
                     products: docs.map(item => {
@@ -43,14 +43,12 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:productId', (req, res, next) => {
-
     const id = req.params.productId;
-    
     Product.findById(id)
         .exec()
         .then(doc => {
             console.log("from database", doc);
-            if(doc) {
+            if (doc) {
                 res.status(200).json(doc);
             } else {
                 res.status(404).json({
@@ -95,16 +93,23 @@ router.patch('/:productId', (req, res, next) => {
     for (const ops of req.body) {
         updateOps[ops.propName] = ops.value;
     }
-    Product.updateOne({ _id: id }, { $set: updateOps })
+    Product.findById(id)
         .exec()
         .then(result => {
-            res.status(200).json({
-                message: 'Product updated',
-                request: {
-                    type: 'GET',
-                    url: 'http://localhost:3000/products/' + id
-                }
-            });
+            if(!result) {
+                return res.status(404).json('Product Id is not found / it is invalid');
+            } else {
+                return Product.updateOne({ _id: id }, { $set: updateOps })
+                    .then(product => {
+                        res.status(200).json({
+                            message: 'Product updated',
+                            request: {
+                                type: 'GET',
+                                url: 'http://localhost:3000/products/' + id
+                            }
+                        });
+                    })
+            }
         })
         .catch(err => {
             console.log(err);
@@ -116,18 +121,26 @@ router.patch('/:productId', (req, res, next) => {
 
 router.delete('/:productId', (req, res, next) => {
     const id = req.params.productId;
-    Product.deleteOne({ _id: id })
+    Product.findById(id)
         .exec()
         .then(result => {
-            console.log(result);
-            res.status(200).json({
-                message: 'product has been deleted',
-                request: {
-                    type: 'POST',
-                    url: 'http://localhost:3000/products',
-                    body: { name: 'String', price: 'Number' }
-                }
-            })
+            if (!result) {
+                return res.status(404).json('Product Id is not found');
+            } else {
+                return Product.deleteOne({ _id: id })
+                    .then(product => {
+                        console.log(product);
+                        res.status(200).json({
+                            message: 'product has been deleted',
+                            request: {
+                                type: 'POST',
+                                url: 'http://localhost:3000/products',
+                                body: { name: 'String', price: 'Number' }
+                            }
+                        })
+                    })
+            }
+
         })
         .catch(err => {
             res.status(500).json({
