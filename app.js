@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
+const path = require('path');
 
 //db connection here useNewUrlParser or maybe it will be useNewUrlParser or useMongoClient
 mongoose.connect('mongodb+srv://ura-shop:' + process.env.mongo_atlas_PW + '@ura-shop-7vpyn.mongodb.net/test?retryWrites=true', {useNewUrlParser: true, useCreateIndex: true})
@@ -16,6 +17,7 @@ const ordersRoutes = require('./api/routes/orders');
 
 //default setup
 app.use(morgan('dev'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(cors());

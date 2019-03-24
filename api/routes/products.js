@@ -1,6 +1,35 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname); //: is not read by windows
+    }
+  });
+
+//setup supported file type
+const fileFilter = (req, file, cb) => {
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+    // cb(new Error('I don\'t have a clue!'));
+}
+
+   
+const upload = multer({ 
+    storage: storage,
+    limits: {
+        fileSize: 1024 * 1024 * 5
+    },
+    fileFilter: fileFilter
+ });
 
 const Product = require('./../models/product');
 
@@ -8,7 +37,7 @@ const Product = require('./../models/product');
 router.get('/', (req, res, next) => {
     Product.find()
         // We can use here just -__v to avoid this
-        .select('_id name price')
+        .select('_id name price productImage')
         .exec()
         .then(docs => {
             console.log(docs);
@@ -20,6 +49,7 @@ router.get('/', (req, res, next) => {
                             _id: item._id,
                             name: item.name,
                             price: item.price,
+                            productImage: item.productImage,
                             request: {
                                 type: 'GET',
                                 url: 'http://localhost:3000/products/' + item._id
@@ -64,11 +94,13 @@ router.get('/:productId', (req, res, next) => {
         })
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', upload.single('productImage'), (req, res, next) => {
+    // console.log(req.file);
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        price: req.body.price
+        price: req.body.price,
+        productImage: req.file.path
     });
     product
         .save()

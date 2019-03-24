@@ -14,6 +14,13 @@ const productSchema = mongoose.Schema({
         required: true,
         min: 100,
         max: 500
+    },
+    productImage: {
+        type: String,
+        unique: true,
+        required: true,
+        minlength: 5,
+        maxlength: 200
     }
 })
 
