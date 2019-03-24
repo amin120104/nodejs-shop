@@ -8,6 +8,7 @@ const Product = require('./../models/product');
 
 router.get('/', (req, res, next) => {
     Order.find()
+        .populate('product', '-__v')
         .select('-__v')
         .exec()
         .then(docs => {
@@ -26,6 +27,8 @@ router.get('/', (req, res, next) => {
 //here also an use when valid object is pass but that are not in database
 router.get('/:orderId', (req, res, next) => {
     Order.findById(req.params.orderId)
+        //here will be details data
+        .populate('product', '-__v')
         .exec()
         .then(docs => {
             if(docs) {
@@ -91,7 +94,7 @@ router.patch('/:orderId', (req, res) => {
 
 router.delete('/:orderId', (req, res) => {
     const id = req.params.orderId;
-    Order.remove({ _id: id })
+    Order.deleteOne({ _id: id })
         .exec()
         .then(result => {
             res.status(200).json({

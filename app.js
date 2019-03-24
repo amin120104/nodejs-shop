@@ -5,7 +5,9 @@ const cors = require('cors');
 const morgan = require('morgan');
 
 //db connection here useNewUrlParser or maybe it will be useNewUrlParser or useMongoClient
-mongoose.connect('mongodb+srv://ura-shop:' + process.env.mongo_atlas_PW + '@ura-shop-7vpyn.mongodb.net/test?retryWrites=true', {useNewUrlParser: true, useCreateIndex: true});
+mongoose.connect('mongodb+srv://ura-shop:' + process.env.mongo_atlas_PW + '@ura-shop-7vpyn.mongodb.net/test?retryWrites=true', {useNewUrlParser: true, useCreateIndex: true})
+    .then(() => console.log('connected to Database'))
+    .catch(err => console.log(`Database connection error. ${err} `));
 mongoose.Promise = global.Promise;
 
 //all route include from api/routes/ directory
