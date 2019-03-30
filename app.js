@@ -14,6 +14,7 @@ mongoose.Promise = global.Promise;
 //all route include from api/routes/ directory
 const productsRoutes = require('./api/routes/products');
 const ordersRoutes = require('./api/routes/orders');
+const userRoutes = require('./api/routes/user');
 
 //default setup
 app.use(morgan('dev'));
@@ -22,9 +23,10 @@ app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(cors());
 
-//all routes uses here
+//all routes
 app.use('/products', productsRoutes);
 app.use('/orders', ordersRoutes);
+app.use('/user', userRoutes);
 
 //error handler for all route(this is failed when db integrated)
 app.use((req, res, next) => {
@@ -33,7 +35,7 @@ app.use((req, res, next) => {
     next(error);
 })
 
-//for db and all
+//error handler for db and all
 app.use((error, req, res, next) => {
     res.status(error.status || 500);
     res.json({

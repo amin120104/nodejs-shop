@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/amin120104/nodejs-shop#readme",
   "dependencies": {
+    "bcrypt": "^3.0.5",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "mongoose": "^5.4.19",
