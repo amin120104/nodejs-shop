@@ -2,57 +2,17 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
+//all schema
 const Order = require('../models/order');
 const Product = require('./../models/product');
 
+//all controller
+const OrderController = require('../controllers/orders');
 
-router.get('/', (req, res, next) => {
-    Order.find()
-        .populate('product', '-__v')
-        .select('-__v')
-        .exec()
-        .then(docs => {
-            res.status(201).json({
-                message: `Total ${docs.length} orders found`,
-                orders: docs
-            });
-        })
-        .catch(err => {
-            res.status(500).json({
-                error: err
-            })
-        });
-});
+router.get('/', OrderController.orders_get_all);
 
 //here also an use when valid object is pass but that are not in database
-router.get('/:orderId', (req, res, next) => {
-    Order.findById(req.params.orderId)
-        //here will be details data
-        .populate('product', '-__v')
-        .exec()
-        .then(docs => {
-            if(docs) {
-                res.status(201).json({
-                    message: 'order found',
-                    orders: docs,
-                    request: {
-                        type: 'GET',
-                        url: 'http://localhost:3000/orders'
-                    }
-                });
-            } else {
-                res.status(404).json({
-                    message: "No Order found againist the ID"
-                })
-            }
-            
-        })
-        .catch(err => {
-            res.status(500).json({
-                error: err
-            })
-        });
-});
+router.get('/:orderId', OrderController.orders_get_single);
 
 
 //here have an issue
